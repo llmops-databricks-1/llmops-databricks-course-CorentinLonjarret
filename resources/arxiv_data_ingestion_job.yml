@@ -33,7 +33,7 @@ resources:
         owner: "rcian"
         developer: "corentin lonjarret"
 
-      # Timeout 
+      # Timeout
       timeout_seconds: 500
 
       environments:

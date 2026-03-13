@@ -9,20 +9,22 @@ from pyspark.sql.types import ArrayType, LongType, StringType, StructField, Stru
 
 from llmops_databricks_course_CorentinLonjarret.config import ProjectConfig
 
-ARXIV_SCHEMA = StructType([
-    StructField("arxiv_id", StringType(), False),
-    StructField("title", StringType(), False),
-    StructField("authors", ArrayType(StringType()), True),
-    StructField("summary", StringType(), True),
-    StructField("published", LongType(), True),
-    StructField("updated", StringType(), True),
-    StructField("categories", StringType(), True),
-    StructField("pdf_url", StringType(), True),
-    StructField("primary_category", StringType(), True),
-    StructField("ingestion_timestamp", StringType(), True),
-    StructField("processed", LongType(), True),
-    StructField("volume_path", StringType(), True),
-])
+ARXIV_SCHEMA = StructType(
+    [
+        StructField("arxiv_id", StringType(), False),
+        StructField("title", StringType(), False),
+        StructField("authors", ArrayType(StringType()), True),
+        StructField("summary", StringType(), True),
+        StructField("published", LongType(), True),
+        StructField("updated", StringType(), True),
+        StructField("categories", StringType(), True),
+        StructField("pdf_url", StringType(), True),
+        StructField("primary_category", StringType(), True),
+        StructField("ingestion_timestamp", StringType(), True),
+        StructField("processed", LongType(), True),
+        StructField("volume_path", StringType(), True),
+    ]
+)
 
 
 class ArxivDataIngester:
@@ -56,7 +58,11 @@ class ArxivDataIngester:
     # ------------------------------------------------------------------
     # Fetch
     # ------------------------------------------------------------------
-    def fetch_papers(self,query: str = "cat:cs.AI OR cat:cs.LG",max_results: int = 50,) -> list[dict]:
+    def fetch_papers(
+        self,
+        query: str = "cat:cs.AI OR cat:cs.LG",
+        max_results: int = 50,
+    ) -> list[dict]:
         """Fetch arXiv papers using the arXiv API.
 
         Args:
@@ -114,11 +120,7 @@ class ArxivDataIngester:
         """
         df = self.spark.createDataFrame(papers, schema=ARXIV_SCHEMA)
 
-        df.write \
-            .format("delta") \
-            .mode("overwrite") \
-            .option("mergeSchema", "true") \
-            .saveAsTable(self._table_path)
+        df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(self._table_path)
 
         logger.info(f"Created Delta table: {self._table_path}")
         logger.info(f"Records: {df.count()}")

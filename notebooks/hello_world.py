@@ -10,7 +10,7 @@ print("Environment is ready.")
 
 # COMMAND ----------
 
-from databricks.connect import DatabricksSession
+from databricks.connect import DatabricksSession  # noqa: E402
 
 spark = DatabricksSession.builder.profile("DEV").serverless(True).getOrCreate()
 df = spark.read.table("samples.nyctaxi.trips")
