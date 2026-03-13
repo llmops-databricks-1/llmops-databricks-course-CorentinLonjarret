@@ -1,0 +1,22 @@
+# Project Configuration for LLMOps Course
+
+# Development environment
+dev:
+  catalog: cbcrc_catalog_dev
+  schema: rc_ian_sandbox
+  # volume: rc_model_ian_volume
+  table: arxiv_papers_corentin
+
+# Acceptance/Staging environment
+acc:
+  catalog: cbcrc_catalog_dev # To change later to a staging catalog when available
+  schema: rc_ian_sandbox
+  # volume: rc_model_ian_volume
+  table: arxiv_papers_corentin
+
+# Production environment
+prd:
+  catalog: cbcrc_catalog_dev # To change later to a production catalog when available
+  schema: rc_ian_sandbox
+  # volume: rc_model_ian_volume
+  table: arxiv_papers_corentin
