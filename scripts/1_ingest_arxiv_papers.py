@@ -7,8 +7,8 @@ Usage:
 from loguru import logger
 from pyspark.sql import SparkSession
 
-from llmops_databricks_course_CorentinLonjarret.arxiv_ingestion import ArxivDataIngester
-from llmops_databricks_course_CorentinLonjarret.config import get_env, load_config
+from arxiv_curator.arxiv_ingestion import ArxivDataIngester
+from arxiv_curator.config import get_env, load_config
 
 # Init Spark session
 spark = SparkSession.builder.getOrCreate()
@@ -17,7 +17,7 @@ spark = SparkSession.builder.getOrCreate()
 env = get_env(spark)
 logger.info(f"Loading configuration (env={env})")
 cfg = load_config("project_config.yml", env)
-logger.info(f"Configuration loaded: catalog={cfg.catalog}schema={cfg.schema_name} processed_table={cfg.table}")
+logger.info(f"Configuration loaded: catalog={cfg.catalog} schema={cfg.schema_name} processed_table={cfg.table}")
 
 # Init ArxivDataIngester
 logger.info("Initializing ArxivDataIngester")

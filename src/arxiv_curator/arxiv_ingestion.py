@@ -7,7 +7,7 @@ from loguru import logger
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import ArrayType, LongType, StringType, StructField, StructType
 
-from llmops_databricks_course_CorentinLonjarret.config import ProjectConfig
+from arxiv_curator.config import ProjectConfig
 
 ARXIV_SCHEMA = StructType(
     [
