@@ -3,11 +3,10 @@
 from datetime import datetime
 
 import arxiv
+from llmops_databricks_course_CorentinLonjarret.config import get_env, load_config
 from loguru import logger
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType, LongType, StringType, StructField, StructType
-
-from llmops_databricks_course_CorentinLonjarret.config import get_env, load_config
 
 # COMMAND ----------
 # Create Spark session
