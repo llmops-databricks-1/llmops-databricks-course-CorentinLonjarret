@@ -3,20 +3,26 @@
 # Development environment
 dev:
   catalog: cbcrc_catalog_dev
-  schema: rc_ian_sandbox
-  # volume: rc_model_ian_volume
+  schema: rc_model_ian
+  volume: rc_model_ian_volume
   table: arxiv_papers_corentin
+  embedding_endpoint: databricks-gte-large-en
+  vector_search_endpoint: llmops_course_vs_endpoint
 
 # Acceptance/Staging environment
 acc:
   catalog: cbcrc_catalog_dev # To change later to a staging catalog when available
-  schema: rc_ian_sandbox
-  # volume: rc_model_ian_volume
+  schema: rc_model_ian
+  volume: rc_model_ian_volume
   table: arxiv_papers_corentin
+  embedding_endpoint: databricks-gte-large-en
+  vector_search_endpoint: llmops_course_vs_endpoint
 
 # Production environment
 prd:
   catalog: cbcrc_catalog_dev # To change later to a production catalog when available
-  schema: rc_ian_sandbox
-  # volume: rc_model_ian_volume
+  schema: rc_model_ian
+  volume: rc_model_ian_volume
   table: arxiv_papers_corentin
+  embedding_endpoint: databricks-gte-large-en
+  vector_search_endpoint: llmops_course_vs_endpoint

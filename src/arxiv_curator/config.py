@@ -13,8 +13,10 @@ class ProjectConfig(BaseModel):
 
     catalog: str = Field(..., description="Unity Catalog name")
     db_schema: str = Field(..., description="Schema name", alias="schema")
-    # volume: str = Field(..., description="Volume name")
+    volume: str = Field(..., description="Volume name")
     table: str = Field(..., description="Table name")
+    embedding_endpoint: str = Field(..., description="Embedding endpoint name")
+    vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
 
     model_config = {"populate_by_name": True}
 
@@ -50,10 +52,10 @@ class ProjectConfig(BaseModel):
         """Get fully qualified schema name."""
         return f"{self.catalog}.{self.db_schema}"
 
-    # @property
-    # def full_volume_path(self) -> str:
-    #     """Get fully qualified volume path."""
-    #     return f"{self.catalog}.{self.schema}.{self.volume}"
+    @property
+    def full_volume_path(self) -> str:
+        """Get fully qualified volume path."""
+        return f"{self.catalog}.{self.schema}.{self.volume}"
 
 
 def load_config(config_path: str = "project_config.yml", env: str = "dev") -> ProjectConfig:
