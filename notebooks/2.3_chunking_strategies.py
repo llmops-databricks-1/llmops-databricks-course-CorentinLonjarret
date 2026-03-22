@@ -38,24 +38,38 @@
 
 # COMMAND ----------
 
+import os
 import re
 
+from dotenv import load_dotenv
 from loguru import logger
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.functions import col
 
 from arxiv_curator.config import get_env, load_config
+from arxiv_curator.utils import is_databricks
 
 # COMMAND ----------
 
-spark = SparkSession.builder.getOrCreate()
+# Init Spark session
+if not is_databricks():
+    load_dotenv()
+    profile = os.environ.get("PROFILE", "DEV")
+    logger.info(f"Profile : {profile} (Execution outside Databricks)")
 
-# Load configuration
+spark = SparkSession.builder.getOrCreate()
+logger.info(f"Create Spark Session with the cluster: {spark.conf.get('spark.databricks.clusterUsageTags.clusterId')}")
+
+# COMMAND ----------
+# Load config
 env = get_env(spark)
-cfg = load_config("../project_config.yml", env)
+logger.info(f"Loading configuration (env={env})")
+cfg = load_config("project_config.yml", env)
 catalog = cfg.catalog
 schema = cfg.schema
+chunks_table = cfg.chunks_table
+logger.info(f"Configuration loaded: catalog={catalog} | schema={schema} | chunks_table={chunks_table}")
 
 # COMMAND ----------
 
@@ -98,7 +112,7 @@ schema = cfg.schema
 # COMMAND ----------
 
 # Load chunks from the arxiv_chunks_table created in Lecture 2.2
-chunks_df = spark.table(f"{catalog}.{schema}.arxiv_chunks_table")
+chunks_df = spark.table(f"{catalog}.{schema}.{chunks_table}")
 
 logger.info(f"Total chunks available: {chunks_df.count()}")
 chunks_df.show(5, truncate=50)
@@ -167,9 +181,12 @@ def fixed_size_chunking(text: str, chunk_size: int = 500, overlap: int = 50) -> 
 
 
 # COMMAND ----------
+sample_text = chunks_df.select("text").take(6)[3]["text"]
+print(sample_text)
+
+# COMMAND ----------
 
 # Example: Apply fixed-size chunking to a sample chunk
-sample_text = chunks_df.select("text").first()["text"]
 fixed_chunks = fixed_size_chunking(sample_text, chunk_size=500, overlap=50)
 
 logger.info(f"Original text length: {len(sample_text)} characters")
