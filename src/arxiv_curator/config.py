@@ -14,7 +14,9 @@ class ProjectConfig(BaseModel):
     catalog: str = Field(..., description="Unity Catalog name")
     db_schema: str = Field(..., description="Schema name", alias="schema")
     volume: str = Field(..., description="Volume name")
-    table: str = Field(..., description="Table name")
+    papers_table: str = Field(..., description="Papers table name")
+    parsed_table: str = Field(..., description="Parsed table name")
+    chunks_table: str = Field(..., description="Chunks table name")
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
 
@@ -43,7 +45,7 @@ class ProjectConfig(BaseModel):
         return cls(**config_data[env])
 
     @property
-    def schema_name(self) -> str:
+    def schema(self) -> str:  # type: ignore
         """Alias for db_schema for backward compatibility."""
         return self.db_schema
 

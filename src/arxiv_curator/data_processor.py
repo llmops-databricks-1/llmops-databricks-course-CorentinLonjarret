@@ -55,11 +55,12 @@ class DataProcessor:
         self.schema = config.schema
         self.volume = config.volume
 
-        self.end = time.strftime("%Y%m%d%H%M", time.gmtime())
-        self.pdf_dir = f"/Volumes/{self.catalog}/{self.schema}/{self.volume}/{self.end}"
+        self.end = time.strftime("%Y%m%d%H", time.gmtime())
+        self.pdf_dir = f"/Volumes/{self.catalog}/{self.schema}/{self.volume}/corentin/{self.end}"
         os.makedirs(self.pdf_dir, exist_ok=True)
-        self.papers_table = f"{self.catalog}.{self.schema}.arxiv_papers"
-        self.parsed_table = f"{self.catalog}.{self.schema}.ai_parsed_docs_table"
+        self.papers_table = f"{self.catalog}.{self.schema}.{config.papers_table}"
+        self.parsed_table = f"{self.catalog}.{self.schema}.{config.parsed_table}"
+        self.chunks_table = f"{self.catalog}.{self.schema}.{config.chunks_table}"
 
     def _get_range_start(self) -> str:
         """
@@ -68,7 +69,7 @@ class DataProcessor:
         Otherwise, uses 3 days ago as start.
 
         Returns:
-            start string in "YYYYMMDDHHMM" format
+            start string in "YYYYMMDDHH" format
         """
 
         if self.spark.catalog.tableExists(self.papers_table):
@@ -79,7 +80,7 @@ class DataProcessor:
             start = str(result[0][0])
             logger.info(f"Found existing arxiv_papers table. Starting from: {start}")
         else:
-            start = time.strftime("%Y%m%d%H%M", time.gmtime(time.time() - 24 * 3600 * 3))
+            start = time.strftime("%Y%m%d%H", time.gmtime(time.time() - 24 * 3600 * 3))
             logger.info(f"No existing arxiv_papers table. Starting from 3 days ago: {start}")
         return start
 
@@ -98,13 +99,14 @@ class DataProcessor:
 
         # Search for papers in arxiv
         client = arxiv.Client()
-        search = arxiv.Search(query=f"cat:cs.AI AND submittedDate:[{start} TO {self.end}]")
+        search = arxiv.Search(query=f"cat:cs.AI AND submittedDate:[{start} TO {self.end}]", max_results=10)
         papers = client.results(search)
 
         # Download papers and collect metadata
         records = []
-
+        logger.info(f"Start downloading papers from {start} to {self.end}")
         for paper in papers:
+            logger.info(f"Try to download paper {paper.get_short_id()} - {paper.title}")
             paper_id = paper.get_short_id()
             try:
                 paper.download_pdf(dirpath=self.pdf_dir, filename=f"{paper_id}.pdf")
@@ -116,12 +118,11 @@ class DataProcessor:
                         "authors": [author.name for author in paper.authors],
                         "summary": paper.summary,
                         "pdf_url": paper.pdf_url,
-                        "published": int(paper.published.strftime("%Y%m%d%H%M")),
+                        "published": int(paper.published.strftime("%Y%m%d%H")),
                         "processed": int(self.end),
                         "volume_path": f"{self.pdf_dir}/{paper_id}.pdf",
                     }
                 )
-                break
             except Exception:
                 logger.warning(f"Paper {paper_id} was not successfully processed.")
             # Avoid hitting API rate limits
@@ -305,16 +306,15 @@ class DataProcessor:
         )
 
         # Write to table
-        arxiv_chunks_table = f"{self.catalog}.{self.schema}.arxiv_chunks_table"
-        chunks_df.write.mode("append").saveAsTable(arxiv_chunks_table)
-        logger.info(f"Saved chunks to {arxiv_chunks_table}")
+        chunks_df.write.mode("append").saveAsTable(self.chunks_table)
+        logger.info(f"Saved chunks to {self.chunks_table}")
 
         # Enable Change Data Feed
         self.spark.sql(f"""
-            ALTER TABLE {arxiv_chunks_table}
+            ALTER TABLE {self.chunks_table}
             SET TBLPROPERTIES (delta.enableChangeDataFeed = true)
         """)
-        logger.info(f"Change Data Feed enabled for {arxiv_chunks_table}")
+        logger.info(f"Change Data Feed enabled for {self.chunks_table}")
 
     def process_and_save(self) -> None:
         """

@@ -5,7 +5,9 @@ dev:
   catalog: cbcrc_catalog_dev
   schema: rc_model_ian
   volume: rc_model_ian_volume
-  table: arxiv_papers_corentin
+  papers_table: arxiv_papers_corentin
+  parsed_table: ai_parsed_docs_table_corentin
+  chunks_table: arxiv_chunks_table_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint
 
@@ -14,7 +16,9 @@ acc:
   catalog: cbcrc_catalog_dev # To change later to a staging catalog when available
   schema: rc_model_ian
   volume: rc_model_ian_volume
-  table: arxiv_papers_corentin
+  papers_table: arxiv_papers_corentin
+  parsed_table: ai_parsed_docs_table_corentin
+  chunks_table: arxiv_chunks_table_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint
 
@@ -23,6 +27,8 @@ prd:
   catalog: cbcrc_catalog_dev # To change later to a production catalog when available
   schema: rc_model_ian
   volume: rc_model_ian_volume
-  table: arxiv_papers_corentin
+  papers_table: arxiv_papers_corentin
+  parsed_table: ai_parsed_docs_table_corentin
+  chunks_table: arxiv_chunks_table_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint
