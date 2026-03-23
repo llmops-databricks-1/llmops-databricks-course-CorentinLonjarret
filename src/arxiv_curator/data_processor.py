@@ -193,6 +193,7 @@ class DataProcessor:
         Parse PDFs using ai_parse_document and store in ai_parsed_docs table.
 
         """
+        logger.info(f"Parsing PDFs from {self.pdf_dir} with ai_parse_document")
 
         self.spark.sql(f"""
             CREATE TABLE IF NOT EXISTS {self.parsed_table} (

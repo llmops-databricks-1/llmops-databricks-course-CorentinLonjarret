@@ -20,6 +20,10 @@ class ProjectConfig(BaseModel):
     index_table: str = Field(..., description="Index table name")
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
+    arxiv_max_results_per_request: int = Field(..., description="Max results per arXiv API request")
+    arxiv_end_date_request: str | None = Field(
+        None, description="End date for arXiv request in YYYYMMDDHH format. None means current time."
+    )
 
     model_config = {"populate_by_name": True}
 

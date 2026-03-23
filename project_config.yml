@@ -11,6 +11,8 @@ dev:
   index_table : arxiv_index_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
+  arxiv_max_results_per_request : 10
+  arxiv_end_date_request : None
 
 # Acceptance/Staging environment
 acc:
@@ -23,6 +25,8 @@ acc:
   index_table : arxiv_index_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
+  arxiv_max_results_per_request : 10
+  arxiv_end_date_request : None
 
 # Production environment
 prd:
@@ -35,3 +39,5 @@ prd:
   index_table : arxiv_index_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
+  arxiv_max_results_per_request : 10
+  arxiv_end_date_request : None

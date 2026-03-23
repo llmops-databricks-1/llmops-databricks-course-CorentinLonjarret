@@ -1,0 +1,34 @@
+resources:
+  jobs:
+    arxiv_process_data_job:
+      name: arxiv_process_data
+      tags:
+        project_name: "llmops-databricks-course-CorentinLonjarret"
+        team: "rc_ian"
+        owner: "rcian"
+        developer: "corentin lonjarret"
+
+      # Timeout
+      timeout_seconds: 9000
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ../dist/*.whl
+
+      tasks:
+        - task_key: arxiv_process_data
+          environment_key: default
+          spark_python_task:
+            python_file: ../scripts/1_process_data.py
+            parameters:
+              - "--root_path"
+              - "${workspace.root_path}"
+              - "--env"
+              - "${bundle.target}"
+              - "--git_sha"
+              - "${var.git_sha}"
+              - "--job_run_id"
+              - "{{job.run_id}}"
