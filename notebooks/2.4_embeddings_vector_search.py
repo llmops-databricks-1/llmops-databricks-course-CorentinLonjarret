@@ -12,22 +12,37 @@
 
 # COMMAND ----------
 
-from arxiv_curator.vector_search import VectorSearchManager
+import os
+
 from databricks.vector_search.reranker import DatabricksReranker
+from dotenv import load_dotenv
 from loguru import logger
 from pyspark.sql import SparkSession
 
 from arxiv_curator.config import get_env, load_config
+from arxiv_curator.utils import is_databricks
+from arxiv_curator.vector_search import VectorSearchManager
 
 # COMMAND ----------
 
-spark = SparkSession.builder.getOrCreate()
+# Init Spark session
+if not is_databricks():
+    load_dotenv()
+    profile = os.environ.get("PROFILE", "DEV")
+    logger.info(f"Profile : {profile} (Execution outside Databricks)")
 
-# Load configuration
+spark = SparkSession.builder.getOrCreate()
+logger.info(f"Create Spark Session with the cluster: {spark.conf.get('spark.databricks.clusterUsageTags.clusterId')}")
+
+# COMMAND ----------
+
+# Load config
 env = get_env(spark)
-cfg = load_config("../project_config.yml", env)
+logger.info(f"Loading configuration (env={env})")
+cfg = load_config("project_config.yml", env)
 catalog = cfg.catalog
 schema = cfg.schema
+logger.info(f"Configuration loaded: catalog={catalog} | schema={schema}")
 
 # COMMAND ----------
 

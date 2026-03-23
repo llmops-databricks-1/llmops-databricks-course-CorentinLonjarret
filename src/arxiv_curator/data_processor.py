@@ -41,21 +41,28 @@ class DataProcessor:
     - Saving chunks to Delta tables
     """
 
-    def __init__(self, spark: SparkSession, config: ProjectConfig) -> None:
+    def __init__(
+        self, spark: SparkSession, config: ProjectConfig, end: str | None = None, max_results: int = 10
+    ) -> None:
         """
         Initialize DataProcessor with Spark session and configuration.
 
         Args:
             spark: SparkSession instance
             config: ProjectConfig object with table configurations
+            end: End time in "YYYYMMDDHH" format. If provided, _get_range_start
+                 will use 3 days before this date. Defaults to current UTC time.
+            max_results: Maximum number of papers to fetch from arXiv. Defaults to 10.
         """
         self.spark = spark
         self.cfg = config
         self.catalog = config.catalog
         self.schema = config.schema
         self.volume = config.volume
+        self.past_end = end is not None
+        self.max_results = max_results
 
-        self.end = time.strftime("%Y%m%d%H", time.gmtime())
+        self.end = end if end is not None else time.strftime("%Y%m%d%H", time.gmtime())
         self.pdf_dir = f"/Volumes/{self.catalog}/{self.schema}/{self.volume}/corentin/{self.end}"
         os.makedirs(self.pdf_dir, exist_ok=True)
         self.papers_table = f"{self.catalog}.{self.schema}.{config.papers_table}"
@@ -72,7 +79,11 @@ class DataProcessor:
             start string in "YYYYMMDDHH" format
         """
 
-        if self.spark.catalog.tableExists(self.papers_table):
+        if self.past_end:
+            end_time = time.mktime(time.strptime(self.end, "%Y%m%d%H"))
+            start = time.strftime("%Y%m%d%H", time.gmtime(end_time - 24 * 3600 * 3))
+            logger.info(f"past_end=True. Starting from 3 days before end ({self.end}): {start}")
+        elif self.spark.catalog.tableExists(self.papers_table):
             result = self.spark.sql(f"""
                 SELECT max(processed)
                 FROM {self.papers_table}
@@ -99,7 +110,9 @@ class DataProcessor:
 
         # Search for papers in arxiv
         client = arxiv.Client()
-        search = arxiv.Search(query=f"cat:cs.AI AND submittedDate:[{start} TO {self.end}]", max_results=10)
+        search = arxiv.Search(
+            query=f"cat:cs.AI AND submittedDate:[{start} TO {self.end}]", max_results=self.max_results
+        )
         papers = client.results(search)
 
         # Download papers and collect metadata
@@ -125,6 +138,9 @@ class DataProcessor:
                 )
             except Exception:
                 logger.warning(f"Paper {paper_id} was not successfully processed.")
+                pdf_path = f"{self.pdf_dir}/{paper_id}.pdf"
+                if os.path.exists(pdf_path):
+                    os.remove(pdf_path)
             # Avoid hitting API rate limits
             time.sleep(3)
 
@@ -286,9 +302,9 @@ class DataProcessor:
             col("title"),
             col("summary"),
             concat_ws(", ", col("authors")).alias("authors"),
-            (col("published") / 100000000).cast("int").alias("year"),
-            ((col("published") % 100000000) / 1000000).cast("int").alias("month"),
-            ((col("published") % 1000000) / 10000).cast("int").alias("day"),
+            (col("published") / 1000000).cast("int").alias("year"),
+            ((col("published") % 1000000) / 10000).cast("int").alias("month"),
+            ((col("published") % 10000) / 100).cast("int").alias("day"),
         )
 
         # Create the transformed dataframe

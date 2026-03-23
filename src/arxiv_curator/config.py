@@ -17,6 +17,7 @@ class ProjectConfig(BaseModel):
     papers_table: str = Field(..., description="Papers table name")
     parsed_table: str = Field(..., description="Parsed table name")
     chunks_table: str = Field(..., description="Chunks table name")
+    index_table: str = Field(..., description="Index table name")
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
 
