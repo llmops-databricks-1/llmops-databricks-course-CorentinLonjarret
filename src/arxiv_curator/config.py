@@ -13,8 +13,17 @@ class ProjectConfig(BaseModel):
 
     catalog: str = Field(..., description="Unity Catalog name")
     db_schema: str = Field(..., description="Schema name", alias="schema")
-    # volume: str = Field(..., description="Volume name")
-    table: str = Field(..., description="Table name")
+    volume: str = Field(..., description="Volume name")
+    papers_table: str = Field(..., description="Papers table name")
+    parsed_table: str = Field(..., description="Parsed table name")
+    chunks_table: str = Field(..., description="Chunks table name")
+    index_table: str = Field(..., description="Index table name")
+    embedding_endpoint: str = Field(..., description="Embedding endpoint name")
+    vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
+    arxiv_max_results_per_request: int = Field(..., description="Max results per arXiv API request")
+    arxiv_end_date_request: str | None = Field(
+        None, description="End date for arXiv request in YYYYMMDDHH format. None means current time."
+    )
 
     model_config = {"populate_by_name": True}
 
@@ -41,7 +50,7 @@ class ProjectConfig(BaseModel):
         return cls(**config_data[env])
 
     @property
-    def schema_name(self) -> str:
+    def schema(self) -> str:  # type: ignore
         """Alias for db_schema for backward compatibility."""
         return self.db_schema
 
@@ -50,10 +59,10 @@ class ProjectConfig(BaseModel):
         """Get fully qualified schema name."""
         return f"{self.catalog}.{self.db_schema}"
 
-    # @property
-    # def full_volume_path(self) -> str:
-    #     """Get fully qualified volume path."""
-    #     return f"{self.catalog}.{self.schema}.{self.volume}"
+    @property
+    def full_volume_path(self) -> str:
+        """Get fully qualified volume path."""
+        return f"{self.catalog}.{self.schema}.{self.volume}"
 
 
 def load_config(config_path: str = "project_config.yml", env: str = "dev") -> ProjectConfig:
