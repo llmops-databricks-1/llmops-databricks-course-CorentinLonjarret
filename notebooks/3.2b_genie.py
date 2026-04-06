@@ -75,12 +75,12 @@ if not USE_EXISTING_SPACE:
         warehouse_type=CreateWarehouseRequestWarehouseType("PRO"),
         enable_serverless_compute=True,
         tags=sql.EndpointTags(custom_tags=[sql.EndpointTagPair(key="Project", value="arxiv_curator")]),
-    ).result()
+    ).result()  # type: ignore
     warehouse_id = created.id
     logger.info(f"Created warehouse: {warehouse_id}")
 else:
     # Use warehouse from config
-    warehouse_id = cfg.warehouse_id
+    warehouse_id = cfg.warehouse_id  # type: ignore
     logger.info(f"Using existing warehouse: {warehouse_id}")
 
 # COMMAND ----------
@@ -134,14 +134,14 @@ serialized_space = {
 
 if not USE_EXISTING_SPACE:
     space = w.genie.create_space(
-        warehouse_id=warehouse_id,
+        warehouse_id=warehouse_id,  # type: ignore
         serialized_space=json.dumps(serialized_space),
         title="arxiv-curator-space",
     )
     space_id = space.space_id
     logger.info(f"Created new Genie Space: {space_id}")
 else:
-    logger.info(f"Using existing Genie Space: {space_id}")
+    logger.info(f"Using existing Genie Space: {space_id}")  # type: ignore
 
 # COMMAND ----------
 
@@ -150,9 +150,9 @@ else:
 
 # COMMAND ----------
 
-space = w.genie.get_space(space_id=space_id, include_serialized_space=True)
-logger.info(f"Genie Space ID: {space_id}")
-logger.info(f"Space config: {json.loads(space.serialized_space)}")
+space = w.genie.get_space(space_id=space_id, include_serialized_space=True)  # type: ignore
+logger.info(f"Genie Space ID: {space_id}")  # type: ignore
+logger.info(f"Space config: {json.loads(space.serialized_space)}")  # type: ignore
 
 # COMMAND ----------
 

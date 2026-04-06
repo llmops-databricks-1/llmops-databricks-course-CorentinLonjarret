@@ -3,7 +3,7 @@ import os
 from typing import Any, cast
 from uuid import uuid4
 
-from arxiv_curator.memory import LakebaseMemory
+from arxiv_curator.memory import LakebaseMemory  # type: ignore
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.postgres import PostgresAPI
 from loguru import logger
@@ -16,7 +16,7 @@ dbutils = cast(Any, globals()["dbutils"])
 w = WorkspaceClient()
 pg_api = PostgresAPI(w.api_client)
 
-project_id = cfg.lakebase_project_id
+project_id = cfg.lakebase_project_id  # type: ignore
 
 scope_name = "arxiv-agent-scope"
 os.environ["LAKEBASE_SP_CLIENT_ID"] = dbutils.secrets.get(scope_name, "client_id")

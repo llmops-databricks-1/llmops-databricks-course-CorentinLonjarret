@@ -78,7 +78,7 @@ def retrieve_documents(query: str, num_results: int = 5) -> list[dict]:
     Returns:
         List of document dictionaries with title, text, and metadata
     """
-    index_name = f"{cfg.catalog}.{cfg.schema}.arxiv_index"
+    index_name = f"{cfg.catalog}.{cfg.schema}.{cfg.index_table}"
     index = vsc.get_index(index_name=index_name)
 
     results = index.similarity_search(
@@ -328,7 +328,7 @@ If the context doesn't contain relevant information, say so. Always cite paper t
         # Generate response
         response = self.client.chat.completions.create(
             model=self.llm_endpoint,
-            messages=messages,
+            messages=messages,  # type: ignore
             max_tokens=1000,
         )
 
@@ -337,7 +337,7 @@ If the context doesn't contain relevant information, say so. Always cite paper t
         # Add assistant response to history
         self.conversation_history.append({"role": "assistant", "content": answer})
 
-        return answer
+        return answer  # type: ignore
 
     def clear_history(self) -> None:
         """Clear conversation history."""
@@ -347,7 +347,7 @@ If the context doesn't contain relevant information, say so. Always cite paper t
 # COMMAND ----------
 
 # Create RAG instance
-index_name = f"{cfg.catalog}.{cfg.schema}.arxiv_index"
+index_name = f"{cfg.catalog}.{cfg.schema}.{cfg.index_table}"
 rag = SimpleRAG(llm_endpoint=cfg.llm_endpoint, index_name=index_name)
 
 logger.info("✓ SimpleRAG initialized")

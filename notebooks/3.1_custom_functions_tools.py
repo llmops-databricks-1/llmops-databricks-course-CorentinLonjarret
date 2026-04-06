@@ -47,7 +47,6 @@
 
 import json
 
-from arxiv_curator.mcp import ToolInfo
 from databricks.sdk import WorkspaceClient
 from databricks.vector_search.client import VectorSearchClient
 from loguru import logger
@@ -55,6 +54,7 @@ from openai import OpenAI
 from pyspark.sql import SparkSession
 
 from arxiv_curator.config import get_env, load_config
+from arxiv_curator.mcp import ToolInfo
 
 # COMMAND ----------
 spark = SparkSession.builder.getOrCreate()
@@ -181,8 +181,8 @@ def parse_vector_search_results(results: dict[str, object]) -> list[dict[str, ob
     Returns:
         List of dictionaries with column names as keys
     """
-    columns = [col["name"] for col in results.get("manifest", {}).get("columns", [])]
-    data_array = results.get("result", {}).get("data_array", [])
+    columns = [col["name"] for col in results.get("manifest", {}).get("columns", [])]  # type: ignore
+    data_array = results.get("result", {}).get("data_array", [])  # type: ignore
 
     return [dict(zip(columns, row_data, strict=False)) for row_data in data_array]
 
@@ -190,7 +190,7 @@ def parse_vector_search_results(results: dict[str, object]) -> list[dict[str, ob
 # COMMAND ----------
 
 
-def search_papers(query: str, num_results: int = 5, year_filter: str = None) -> str:
+def search_papers(query: str, num_results: int = 5, year_filter: str = None) -> str:  # type: ignore
     """Search for relevant papers using vector search.
 
     Args:
@@ -201,7 +201,7 @@ def search_papers(query: str, num_results: int = 5, year_filter: str = None) -> 
     Returns:
         JSON string with search results
     """
-    index_name = f"{cfg.catalog}.{cfg.schema}.arxiv_index"
+    index_name = f"{cfg.catalog}.{cfg.schema}.{cfg.index_table}"
     index = vsc.get_index(index_name=index_name)
 
     # Build search parameters
@@ -228,7 +228,7 @@ def search_papers(query: str, num_results: int = 5, year_filter: str = None) -> 
                 "arxiv_id": row.get("arxiv_id", "N/A"),
                 "authors": str(row.get("authors", "N/A")),
                 "year": row.get("year", "N/A"),
-                "excerpt": row.get("text", "")[:200] + "...",
+                "excerpt": row.get("text", "")[:200] + "...",  # type: ignore
             }
         )
 
@@ -498,8 +498,8 @@ class SimpleAgent:
             # Call LLM
             response = self._client.chat.completions.create(
                 model=self.llm_endpoint,
-                messages=messages,
-                tools=self.get_tool_specs() if self._tools_dict else None,
+                messages=messages,  # type: ignore
+                tools=self.get_tool_specs() if self._tools_dict else None,  # type: ignore
             )
 
             assistant_message = response.choices[0].message
@@ -515,17 +515,17 @@ class SimpleAgent:
                             {
                                 "id": tc.id,
                                 "type": "function",
-                                "function": {"name": tc.function.name, "arguments": tc.function.arguments},
+                                "function": {"name": tc.function.name, "arguments": tc.function.arguments},  # type: ignore
                             }
                             for tc in assistant_message.tool_calls
                         ],
-                    }
+                    }  # type: ignore
                 )
 
                 # Execute each tool call
                 for tool_call in assistant_message.tool_calls:
-                    tool_name = tool_call.function.name
-                    tool_args = json.loads(tool_call.function.arguments)
+                    tool_name = tool_call.function.name  # type: ignore
+                    tool_args = json.loads(tool_call.function.arguments)  # type: ignore
 
                     logger.info(f"Calling tool: {tool_name}({tool_args})")
 
@@ -538,7 +538,7 @@ class SimpleAgent:
                     messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": str(result)})
             else:
                 # No tool calls, return the response
-                return assistant_message.content
+                return assistant_message.content  # type: ignore
 
         return "Max iterations reached."
 

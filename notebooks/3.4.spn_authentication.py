@@ -69,11 +69,11 @@ w = WorkspaceClient()
 pg_api = PostgresAPI(w.api_client)
 
 project = pg_api.get_project(name=f"projects/{project_id}")
-default_branch = next(iter(pg_api.list_branches(parent=project.name)))
+default_branch = next(iter(pg_api.list_branches(parent=project.name)))  # type: ignore
 branch_parent = default_branch.name
 
 pg_api.create_role(
-    parent=branch_parent,
+    parent=branch_parent,  # type: ignore
     role=Role(
         spec=RoleRoleSpec(
             identity_type=RoleIdentityType.SERVICE_PRINCIPAL,
@@ -86,22 +86,22 @@ pg_api.create_role(
 
 # COMMAND ----------
 # Step 4: Postgres role SQL
-endpoint = next(iter(pg_api.list_endpoints(parent=branch_parent)))
-host = endpoint.status.hosts.host
-pg_credential = pg_api.generate_database_credential(endpoint=endpoint.name)
+endpoint = next(iter(pg_api.list_endpoints(parent=branch_parent)))  # type: ignore
+host = endpoint.status.hosts.host  # type: ignore
+pg_credential = pg_api.generate_database_credential(endpoint=endpoint.name)  # type: ignore
 
 user = w.current_user.me()
-username = urllib.parse.quote_plus(user.user_name)
+username = urllib.parse.quote_plus(user.user_name)  # type: ignore
 
 conn_string = f"postgresql://{username}:{pg_credential.token}@{host}:5432/databricks_postgres?sslmode=require"
 
 with psycopg.connect(conn_string) as conn:
     conn.execute(f"""
         GRANT USAGE ON SCHEMA public TO "{client_id}";
-    """)
+    """)  # type: ignore
     conn.execute(f"""
         GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE session_messages TO "{client_id}";
-    """)
+    """)  # type: ignore
     conn.execute(f"""
         GRANT USAGE, SELECT ON SEQUENCE session_messages_id_seq TO "{client_id}";
-    """)
+    """)  # type: ignore

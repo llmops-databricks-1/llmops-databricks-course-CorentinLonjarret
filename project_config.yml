@@ -13,31 +13,33 @@ dev:
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
   genie_space_id: "01f131d0de26130db0900094390a53f3"
+  lakebase_project_id: arxiv-agent-lakebase-corentin
   arxiv_max_results_per_request : 10
   arxiv_end_date_request : None
 
-# Acceptance/Staging environment
-acc:
-  catalog: cbcrc_catalog_dev # To change later to a staging catalog when available
-  schema: rc_model_ian
-  volume: rc_model_ian_volume
-  llm_endpoint: databricks-meta-llama-3-1-70b-instruct
-  papers_table: arxiv_papers_corentin
-  parsed_table: ai_parsed_docs_table_corentin
-  chunks_table: arxiv_chunks_table_corentin
-  index_table : arxiv_index_corentin
-  embedding_endpoint: databricks-gte-large-en
-  vector_search_endpoint: llmops_course_vs_endpoint_corentin
-  genie_space_id: "01f131d0de26130db0900094390a53f3"
-  arxiv_max_results_per_request : 10
-  arxiv_end_date_request : None
+# # Acceptance/Staging environment
+# acc:
+#   catalog: cbcrc_catalog_dev # To change later to a staging catalog when available
+#   schema: rc_model_ian
+#   volume: rc_model_ian_volume
+#   llm_endpoint: databricks-meta-llama-3-3-70b-instruct
+#   papers_table: arxiv_papers_corentin
+#   parsed_table: ai_parsed_docs_table_corentin
+#   chunks_table: arxiv_chunks_table_corentin
+#   index_table : arxiv_index_corentin
+#   embedding_endpoint: databricks-gte-large-en
+#   vector_search_endpoint: llmops_course_vs_endpoint_corentin
+#   genie_space_id: "01f131d0de26130db0900094390a53f3"
+#   lakebase_project_id: arxiv-agent-lakebase-corentin
+#   arxiv_max_results_per_request : 10
+#   arxiv_end_date_request : None
 
 # Production environment
 prod:
   catalog: cbcrc_catalog_prod # To change later to a production catalog when available
   schema: rc_ian_sandbox
   volume: rc_ian_uvc
-  llm_endpoint: databricks-meta-llama-3-1-70b-instruct
+  llm_endpoint: databricks-meta-llama-3-3-70b-instruct
   papers_table: arxiv_papers_corentin
   parsed_table: ai_parsed_docs_table_corentin
   chunks_table: arxiv_chunks_table_corentin
@@ -45,5 +47,6 @@ prod:
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
   genie_space_id: "01f131d00fd9131091960ccbfd6b9c96"
+  lakebase_project_id: arxiv-agent-lakebase-corentin
   arxiv_max_results_per_request : 10
   arxiv_end_date_request : None

@@ -24,6 +24,7 @@ class ProjectConfig(BaseModel):
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
     genie_space_id: str = Field(..., description="Genie space ID")
+    lakebase_project_id: str = Field(..., description="Lakebase project ID")
     arxiv_max_results_per_request: int = Field(..., description="Max results per arXiv API request")
     arxiv_end_date_request: str | None = Field(
         None, description="End date for arXiv request in YYYYMMDDHH format. None means current time."

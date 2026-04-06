@@ -11,7 +11,7 @@ import urllib.parse
 from uuid import uuid4
 
 import psycopg
-from arxiv_curator.memory import LakebaseMemory
+from arxiv_curator.memory import LakebaseMemory  # type: ignore
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.postgres import (
     PostgresAPI,
@@ -29,7 +29,7 @@ cfg = ProjectConfig.from_yaml("../project_config.yml")
 w = WorkspaceClient()
 pg_api = PostgresAPI(w.api_client)
 
-project_id = cfg.lakebase_project_id
+project_id = cfg.lakebase_project_id  # type: ignore
 
 try:
     project = pg_api.get_project(name=f"projects/{project_id}")
@@ -39,7 +39,7 @@ except Exception:
         project=Project(
             spec=ProjectSpec(
                 display_name=project_id,
-                budget_policy_id=cfg.usage_policy_id,
+                budget_policy_id=cfg.usage_policy_id,  # type: ignore
                 default_endpoint_settings=ProjectDefaultEndpointSettings(
                     autoscaling_limit_min_cu=1,
                     autoscaling_limit_max_cu=4,
@@ -51,14 +51,14 @@ except Exception:
 
 # COMMAND ----------
 # Get endpoint, host, and generate credential
-default_branch = next(iter(pg_api.list_branches(parent=project.name)))
-endpoint = next(iter(pg_api.list_endpoints(parent=default_branch.name)))
-host = endpoint.status.hosts.host
+default_branch = next(iter(pg_api.list_branches(parent=project.name)))  # type: ignore
+endpoint = next(iter(pg_api.list_endpoints(parent=default_branch.name)))  # type: ignore
+host = endpoint.status.hosts.host  # type: ignore
 
 # Get username (works with user credentials in notebook)
 user = w.current_user.me()
-pg_credential = pg_api.generate_database_credential(endpoint=endpoint.name)
-username = urllib.parse.quote_plus(user.user_name)
+pg_credential = pg_api.generate_database_credential(endpoint=endpoint.name)  # type: ignore
+username = urllib.parse.quote_plus(user.user_name)  # type: ignore
 conn_string = f"postgresql://{username}:{pg_credential.token}@{host}:5432/databricks_postgres?sslmode=require"
 
 

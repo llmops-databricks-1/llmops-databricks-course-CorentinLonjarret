@@ -15,7 +15,6 @@ import asyncio
 import json
 
 import nest_asyncio
-from arxiv_curator.mcp import create_mcp_tools
 from databricks.sdk import WorkspaceClient
 from databricks_mcp import DatabricksMCPClient
 from loguru import logger
@@ -23,6 +22,7 @@ from openai import OpenAI
 from pyspark.sql import SparkSession
 
 from arxiv_curator.config import get_env, load_config
+from arxiv_curator.mcp import create_mcp_tools
 
 # Enable nested event loops (required for Databricks notebooks)
 nest_asyncio.apply()
@@ -150,7 +150,7 @@ for tool in vs_tools:
 
 # Search for papers about machine learning
 # The tool name is the index name with '__' separators
-tool_name = f"{cfg.catalog}__{cfg.schema}__arxiv_index"
+tool_name = f"{cfg.catalog}__{cfg.schema}__{cfg.index_table}"
 
 search_result = vs_mcp_client.call_tool(tool_name, {"query": "machine learning and neural networks"})
 
@@ -251,7 +251,7 @@ tools_dict = {tool.name: tool for tool in mcp_tools}
 
 # Example: Use vector search tool directly
 # The tool name is the index name with '__' separators
-vector_search_tool_name = f"{cfg.catalog}__{cfg.schema}__arxiv_index"
+vector_search_tool_name = f"{cfg.catalog}__{cfg.schema}__{cfg.index_table}"
 
 if vector_search_tool_name in tools_dict:
     search_tool = tools_dict[vector_search_tool_name]
@@ -385,8 +385,8 @@ class SimpleAgent:
         for _iteration in range(max_iterations):
             response = self._client.chat.completions.create(
                 model=self.llm_endpoint,
-                messages=messages,
-                tools=self.get_tool_specs() if self._tools_dict else None,
+                messages=messages,  # type: ignore
+                tools=self.get_tool_specs() if self._tools_dict else None,  # type: ignore
             )
 
             assistant_message = response.choices[0].message
@@ -401,16 +401,16 @@ class SimpleAgent:
                             {
                                 "id": tc.id,
                                 "type": "function",
-                                "function": {"name": tc.function.name, "arguments": tc.function.arguments},
+                                "function": {"name": tc.function.name, "arguments": tc.function.arguments},  # type: ignore
                             }
                             for tc in assistant_message.tool_calls
                         ],
-                    }
+                    }  # type: ignore
                 )
 
                 for tool_call in assistant_message.tool_calls:
-                    tool_name = tool_call.function.name
-                    tool_args = json.loads(tool_call.function.arguments)
+                    tool_name = tool_call.function.name  # type: ignore
+                    tool_args = json.loads(tool_call.function.arguments)  # type: ignore
 
                     logger.info(f"Calling tool: {tool_name}({tool_args})")
 
@@ -421,7 +421,7 @@ class SimpleAgent:
 
                     messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": str(result)})
             else:
-                return assistant_message.content
+                return assistant_message.content  # type: ignore
 
         return "Max iterations reached."
 
