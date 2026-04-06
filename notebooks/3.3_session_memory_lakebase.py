@@ -20,10 +20,13 @@ from databricks.sdk.service.postgres import (
 )
 from google.protobuf.duration_pb2 import Duration
 from loguru import logger
+from openai import OpenAI
+from pyspark.sql import SparkSession
 
-from arxiv_curator.config import ProjectConfig
+from arxiv_curator.config import ProjectConfig, get_env, load_config
 from arxiv_curator.memory import LakebaseMemory
 
+# COMMAND ----------
 cfg = ProjectConfig.from_yaml("../project_config.yml")
 
 w = WorkspaceClient()
@@ -141,3 +144,76 @@ loaded = memory.load_messages(session_id)
 logger.info(f"Loaded {len(loaded)} messages:")
 for msg in loaded:
     logger.info(f"  {msg['role']}: {msg['content'][:50]}...")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Using Memory with an LLM
+
+# COMMAND ----------
+spark = SparkSession.builder.getOrCreate()
+env = get_env(spark)
+cfg = load_config("../project_config.yml", env)
+
+# Create OpenAI client for Databricks
+client = OpenAI(
+    api_key=w.tokens.create(lifetime_seconds=1200).token_value, base_url=f"{w.config.host}/serving-endpoints"
+)
+
+
+def chat_with_memory(session_id: str, user_message: str, memory: LakebaseMemory) -> str:
+    """Chat with LLM using session memory for context."""
+    # Load previous messages
+    previous_messages = memory.load_messages(session_id)
+
+    # Build messages with system prompt
+    messages = (
+        [{"role": "system", "content": "You are a helpful research assistant."}]
+        + previous_messages
+        + [{"role": "user", "content": user_message}]
+    )
+
+    # Call LLM
+    response = client.chat.completions.create(
+        model=cfg.llm_endpoint,
+        messages=messages,  # type: ignore
+    )
+
+    assistant_response = response.choices[0].message.content
+
+    # Save new messages to memory
+    memory.save_messages(
+        session_id,
+        [
+            {"role": "user", "content": user_message},
+            {"role": "assistant", "content": assistant_response},
+        ],
+    )
+
+    return assistant_response  # type: ignore
+
+
+logger.info("✓ Chat function with memory created")
+
+# COMMAND ----------
+# Create a new session with memory
+agent_session_id = f"agent-session-{uuid4()}"
+
+# First query
+response1 = chat_with_memory(agent_session_id, "What is RAG in the context of LLMs?", memory)
+logger.info(f"Response 1: {response1[:200]}...")
+
+# COMMAND ----------
+# Follow-up query with context (memory is automatically loaded)
+response2 = chat_with_memory(agent_session_id, "What are the main components?", memory)
+logger.info(f"Response 2: {response2[:200]}...")
+
+# COMMAND ----------
+# View full conversation
+full_agent_conversation = memory.load_messages(agent_session_id)
+
+logger.info(f"✓ Full agent conversation ({len(full_agent_conversation)} messages):")
+for i, msg in enumerate(full_agent_conversation, 1):
+    role = msg["role"]
+    content = msg["content"][:100] + "..." if len(msg["content"]) > 100 else msg["content"]
+    logger.info(f"  {i}. [{role}] {content}")
