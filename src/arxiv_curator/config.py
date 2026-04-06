@@ -1,8 +1,10 @@
 """Configuration management for Arxiv Curator."""
 
+import sys
 from pathlib import Path
 
 import yaml
+from loguru import logger
 from pydantic import BaseModel, Field
 from pyspark.dbutils import DBUtils
 from pyspark.sql import SparkSession
@@ -14,12 +16,14 @@ class ProjectConfig(BaseModel):
     catalog: str = Field(..., description="Unity Catalog name")
     db_schema: str = Field(..., description="Schema name", alias="schema")
     volume: str = Field(..., description="Volume name")
+    llm_endpoint: str = Field(..., description="LLM endpoint name")
     papers_table: str = Field(..., description="Papers table name")
     parsed_table: str = Field(..., description="Parsed table name")
     chunks_table: str = Field(..., description="Chunks table name")
     index_table: str = Field(..., description="Index table name")
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
+    genie_space_id: str = Field(..., description="Genie space ID")
     arxiv_max_results_per_request: int = Field(..., description="Max results per arXiv API request")
     arxiv_end_date_request: str | None = Field(
         None, description="End date for arXiv request in YYYYMMDDHH format. None means current time."
@@ -33,13 +37,13 @@ class ProjectConfig(BaseModel):
 
         Args:
             config_path: Path to the YAML configuration file
-            env: Environment name (dev, acc, prd)
+            env: Environment name (dev, acc, prod)
 
         Returns:
             ProjectConfig instance
         """
-        if env not in ["prd", "acc", "dev"]:
-            raise ValueError(f"Invalid environment: {env}. Expected 'prd', 'acc', or 'dev'")
+        if env not in ["prod", "acc", "dev"]:
+            raise ValueError(f"Invalid environment: {env}. Expected 'prod', 'acc', or 'dev'")
 
         with open(config_path) as f:
             config_data = yaml.safe_load(f)
@@ -90,13 +94,22 @@ def load_config(config_path: str = "project_config.yml", env: str = "dev") -> Pr
 
 
 def get_env(spark: SparkSession) -> str:
-    """Get current environment from dbutils widget, falling back to ENV variable or 'dev'.
+    """Get current environment from dbutils widget or CLI args, falling back to 'dev'.
 
     Returns:
-        Environment name (dev, acc, or prd)
+        Environment name (dev, acc, or prod)
     """
     try:
         dbutils = DBUtils(spark)
-        return dbutils.widgets.get("env")
+        env = dbutils.widgets.get("env")
+        logger.info(f"get_env: Retrieved environment from dbutils widget: {env}")
+        return env
     except Exception:
+        for index, arg in enumerate(sys.argv):
+            if arg == "--env" and index + 1 < len(sys.argv):
+                env = sys.argv[index + 1]
+                logger.info(f"get_env: Retrieved environment from CLI args: {env}")
+                return env
+
+        logger.warning("get_env: Could not retrieve environment from dbutils or CLI args, falling back to 'dev'")
         return "dev"

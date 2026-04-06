@@ -59,10 +59,15 @@ class DataProcessor:
         self.catalog = config.catalog
         self.schema = config.schema
         self.volume = config.volume
-        self.past_end = end is not None
         self.max_results = max_results
 
-        self.end = end if end is not None else time.strftime("%Y%m%d%H", time.gmtime())
+        normalized_end = end.strip() if isinstance(end, str) else None
+        if normalized_end is None or normalized_end.lower() in {"", "none", "null"}:
+            self.past_end = False
+            self.end = time.strftime("%Y%m%d%H", time.gmtime())
+        else:
+            self.past_end = True
+            self.end = normalized_end
         self.pdf_dir = f"/Volumes/{self.catalog}/{self.schema}/{self.volume}/corentin/{self.end}"
         os.makedirs(self.pdf_dir, exist_ok=True)
         self.papers_table = f"{self.catalog}.{self.schema}.{config.papers_table}"
