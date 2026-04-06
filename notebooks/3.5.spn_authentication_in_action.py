@@ -3,12 +3,12 @@ import os
 from typing import Any, cast
 from uuid import uuid4
 
-from arxiv_curator.memory import LakebaseMemory  # type: ignore
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.postgres import PostgresAPI
 from loguru import logger
 
 from arxiv_curator.config import ProjectConfig
+from arxiv_curator.memory import LakebaseMemory  # type: ignore
 
 cfg = ProjectConfig.from_yaml("../project_config.yml")
 dbutils = cast(Any, globals()["dbutils"])

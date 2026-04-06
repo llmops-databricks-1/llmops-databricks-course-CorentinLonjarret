@@ -11,7 +11,6 @@ import urllib.parse
 from uuid import uuid4
 
 import psycopg
-from arxiv_curator.memory import LakebaseMemory  # type: ignore
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.postgres import (
     PostgresAPI,
@@ -23,13 +22,14 @@ from google.protobuf.duration_pb2 import Duration
 from loguru import logger
 
 from arxiv_curator.config import ProjectConfig
+from arxiv_curator.memory import LakebaseMemory
 
 cfg = ProjectConfig.from_yaml("../project_config.yml")
 
 w = WorkspaceClient()
 pg_api = PostgresAPI(w.api_client)
 
-project_id = cfg.lakebase_project_id  # type: ignore
+project_id = cfg.lakebase_project_id
 
 try:
     project = pg_api.get_project(name=f"projects/{project_id}")
@@ -39,7 +39,7 @@ except Exception:
         project=Project(
             spec=ProjectSpec(
                 display_name=project_id,
-                budget_policy_id=cfg.usage_policy_id,  # type: ignore
+                # budget_policy_id=cfg.usage_policy_id,
                 default_endpoint_settings=ProjectDefaultEndpointSettings(
                     autoscaling_limit_min_cu=1,
                     autoscaling_limit_max_cu=4,
