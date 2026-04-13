@@ -37,6 +37,7 @@ dev:
   genie_space_id: "01f131d0de26130db0900094390a53f3"
   lakebase_project_id: arxiv-agent-lakebase-corentin
   experiment_name: /Shared/arxiv-curator-course-corentin
+  agent_name: arxiv_agent_corentin
   arxiv_max_results_per_request : 10
   arxiv_end_date_request : None
 
@@ -73,5 +74,6 @@ prod:
   genie_space_id: "01f131d00fd9131091960ccbfd6b9c96"
   lakebase_project_id: arxiv-agent-lakebase-corentin
   experiment_name: /Shared/arxiv-curator-course-corentin
+  agent_name: arxiv_agent_corentin
   arxiv_max_results_per_request : 10
   arxiv_end_date_request : None

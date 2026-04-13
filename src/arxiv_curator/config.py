@@ -26,6 +26,7 @@ class ProjectConfig(BaseModel):
     genie_space_id: str = Field(..., description="Genie space ID")
     lakebase_project_id: str = Field(..., description="Lakebase project ID")
     experiment_name: str = Field(..., description="Experiment name")
+    agent_name: str = Field(..., description="Registered model name")
     system_prompt: str = Field(
         default="You are a helpful AI assistant that helps users find and understand research papers.",
         description="System prompt for the agent",

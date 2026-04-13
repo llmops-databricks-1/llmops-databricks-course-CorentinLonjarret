@@ -35,7 +35,7 @@ agent = ArxivAgent(
 
 # COMMAND ----------
 # Load evaluation inputs
-with open("../eval_inputs.txt") as f:
+with open("../arxiv_agent/eval_inputs.txt") as f:
     eval_data = [{"inputs": {"question": line.strip()}} for line in f if line.strip()]
 
 
@@ -89,10 +89,12 @@ git_sha = "abc"
 run_id = "unset"
 
 ts = ts = datetime.now().strftime("%Y-%m-%d")
-with mlflow.start_run(run_name=f"arxiv-agent-{ts}", tags={"git_sha": git_sha, "run_id": run_id}) as run:
+with mlflow.start_run(
+    run_name=f"{cfg.agent_name.replace('_', '-')}-{ts}", tags={"git_sha": git_sha, "run_id": run_id}
+) as run:
     model_info = mlflow.pyfunc.log_model(
         name="agent",
-        python_model="../arxiv_agent.py",
+        python_model="../arxiv_agent/arxiv_agent.py",
         resources=resources,
         input_example=test_request,
         model_config=model_config,
@@ -101,7 +103,7 @@ with mlflow.start_run(run_name=f"arxiv-agent-{ts}", tags={"git_sha": git_sha, "r
 
 # COMMAND ----------
 # register model
-model_name = f"{cfg.catalog}.{cfg.schema}.arxiv_agent"
+model_name = f"{cfg.catalog}.{cfg.schema}.{cfg.agent_name}"
 
 registered_model = mlflow.register_model(
     model_uri=model_info.model_uri,
