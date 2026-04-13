@@ -57,8 +57,8 @@ results = mlflow.genai.evaluate(  # type: ignore
 resources = [
     DatabricksServingEndpoint(endpoint_name=cfg.llm_endpoint),
     DatabricksGenieSpace(genie_space_id=cfg.genie_space_id),
-    DatabricksVectorSearchIndex(index_name=cfg.index_table),
-    DatabricksTable(table_name=cfg.papers_table),
+    DatabricksVectorSearchIndex(index_name=f"{cfg.catalog}.{cfg.schema}.{cfg.index_table}"),
+    DatabricksTable(table_name=f"{cfg.catalog}.{cfg.schema}.{cfg.papers_table}"),
     # DatabricksSQLWarehouse(warehouse_id=cfg.warehouse_id),
     DatabricksServingEndpoint(endpoint_name="databricks-bge-large-en"),
 ]
