@@ -17,7 +17,7 @@ dependencies = [
     "openai==2.8.0",
     "databricks-mcp==0.4.0",
     "backoff==2.2.1",
-    "mlflow==3.8.1",
+    "mlflow==3.10.1",
     "nest-asyncio==1.6.0",
     "arxiv==2.3.1",
     "databricks-agents==1.8.2",
@@ -30,8 +30,7 @@ dependencies = [
 dev = ["databricks-connect>=17.0, <18",
        "ipykernel>=6.29.5, <7",
        "pip>=25.0.1, <26",
-       "pre-commit>=4.1.0, <5",
-       "claudetracing>=0.2.0, <1",]
+       "pre-commit>=4.1.0, <5"]
 
 ci = ["pre-commit>=4.1.0, <5",
       "pytest>=8.3.4, <9"]
