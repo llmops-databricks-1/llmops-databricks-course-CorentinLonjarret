@@ -37,9 +37,9 @@ if "DATABRICKS_RUNTIME_VERSION" not in os.environ:
 
 cfg = ProjectConfig.from_yaml("../project_config.yml")
 
-model_name = f"{cfg.catalog}.{cfg.schema}.arxiv_agent"
-endpoint_name = "arxiv-agent-endpoint-dev-course"
-secret_scope = "arxiv-agent-scope"
+model_name = f"{cfg.catalog}.{cfg.schema}.{cfg.agent_name}"
+endpoint_name = "arxiv-agent-endpoint-dev-course-corentin"
+secret_scope = "arxiv-agent-scope-corentin"
 
 model_version = MlflowClient().get_model_version_by_alias(model_name, "latest-model").version
 
@@ -120,3 +120,43 @@ logger.info(response.output[0].content[0].text)  # type: ignore
 logger.info("-" * 80)
 
 # COMMAND ----------
+
+response = client.responses.create(
+    model=endpoint_name,
+    input=[{"role": "user", "content": "What are recent papers about attention?"}],
+    extra_body={
+        "custom_inputs": {
+            "session_id": session_id,
+            "request_id": request_id,
+        }
+    },
+)
+
+logger.info(f"Response ID: {response.id}")
+logger.info(f"Session ID: {response.custom_outputs.get('session_id')}")  # type: ignore
+logger.info(f"Request ID: {response.custom_outputs.get('request_id')}")  # type: ignore
+logger.info("\nAssistant Response:")
+logger.info("-" * 80)
+logger.info(response.output[0].content[0].text)  # type: ignore
+logger.info("-" * 80)
+
+# COMMAND ----------
+
+response = client.responses.create(
+    model=endpoint_name,
+    input=[{"role": "user", "content": "What is the distribution of papers by authors ?"}],
+    extra_body={
+        "custom_inputs": {
+            "session_id": session_id,
+            "request_id": request_id,
+        }
+    },
+)
+
+logger.info(f"Response ID: {response.id}")
+logger.info(f"Session ID: {response.custom_outputs.get('session_id')}")  # type: ignore
+logger.info(f"Request ID: {response.custom_outputs.get('request_id')}")  # type: ignore
+logger.info("\nAssistant Response:")
+logger.info("-" * 80)
+logger.info(response.output[0].content[0].text)  # type: ignore
+logger.info("-" * 80)

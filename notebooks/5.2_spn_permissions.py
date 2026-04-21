@@ -37,6 +37,7 @@ w.permissions.update(
 )
 
 # COMMAND ----------
+
 w.permissions.update(
     request_object_type="warehouses",
     request_object_id=cfg.warehouse_id,  # type: ignore

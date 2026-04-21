@@ -18,6 +18,7 @@ from mlflow.entities import SpanType
 from mlflow.models.resources import (
     DatabricksGenieSpace,
     DatabricksServingEndpoint,
+    DatabricksSQLWarehouse,
     DatabricksTable,
     DatabricksVectorSearchIndex,
 )
@@ -268,9 +269,9 @@ def log_register_agent(
     resources = [
         DatabricksServingEndpoint(endpoint_name=cfg.llm_endpoint),
         DatabricksGenieSpace(genie_space_id=cfg.genie_space_id),
-        DatabricksVectorSearchIndex(index_name=cfg.index_table),
-        DatabricksTable(table_name=cfg.papers_table),
-        # DatabricksSQLWarehouse(warehouse_id=cfg.warehouse_id),
+        DatabricksVectorSearchIndex(index_name=f"{cfg.catalog}.{cfg.schema}.{cfg.index_table}"),
+        DatabricksTable(table_name=f"{cfg.catalog}.{cfg.schema}.{cfg.papers_table}"),
+        DatabricksSQLWarehouse(warehouse_id=cfg.warehouse_id),
         DatabricksServingEndpoint(endpoint_name="databricks-bge-large-en"),
     ]
 
@@ -285,7 +286,7 @@ def log_register_agent(
 
     test_request = {"input": [{"role": "user", "content": "What are recent papers about LLMs and reasoning?"}]}
 
-    mlflow.set_experiment(cfg.experiment_path)  # type: ignore
+    mlflow.set_experiment(cfg.experiment_name)
     ts = datetime.now().strftime("%Y-%m-%d")
 
     with mlflow.start_run(

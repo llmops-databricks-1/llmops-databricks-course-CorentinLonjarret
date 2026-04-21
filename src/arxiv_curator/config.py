@@ -24,6 +24,7 @@ class ProjectConfig(BaseModel):
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
     genie_space_id: str = Field(..., description="Genie space ID")
+    warehouse_id: str | None = Field(None, description="SQL warehouse ID backing the Genie space")
     lakebase_project_id: str = Field(..., description="Lakebase project ID")
     experiment_name: str = Field(..., description="Experiment name")
     agent_name: str = Field(..., description="Registered model name")
@@ -86,18 +87,47 @@ def load_config(config_path: str = "project_config.yml", env: str = "dev") -> Pr
     Returns:
         ProjectConfig instance
     """
-    # Handle relative paths from notebooks
     if not Path(config_path).is_absolute():
-        # Try to find config in parent directories
-        current = Path.cwd()
-        for _ in range(3):  # Search up to 3 levels
-            candidate = current / config_path
+        config_path = str(resolve_project_path(config_path))
+
+    return ProjectConfig.from_yaml(config_path, env)
+
+
+def resolve_project_path(path: str) -> Path:
+    """Resolve a project-relative path from the current runtime context.
+
+    This supports local execution, notebooks, and Databricks ``spark_python_task``
+    runs where ``__file__`` may not be defined.
+    """
+
+    path_obj = Path(path)
+    if path_obj.is_absolute():
+        return path_obj
+
+    search_roots: list[Path] = [Path.cwd()]
+    if sys.argv and sys.argv[0]:
+        try:
+            search_roots.append(Path(sys.argv[0]).resolve().parent)
+        except OSError:
+            logger.warning(f"Could not resolve sys.argv[0]: {sys.argv[0]}")
+
+    seen: set[Path] = set()
+    for root in search_roots:
+        current = root.resolve()
+        for _ in range(5):
+            if current in seen:
+                break
+            seen.add(current)
+
+            candidate = current / path_obj
             if candidate.exists():
-                config_path = str(candidate)
+                return candidate
+
+            if current.parent == current:
                 break
             current = current.parent
 
-    return ProjectConfig.from_yaml(config_path, env)
+    raise FileNotFoundError(f"Could not resolve project path: {path}")
 
 
 def get_env(spark: SparkSession) -> str:
