@@ -35,6 +35,7 @@ dev:
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
   genie_space_id: "01f131d0de26130db0900094390a53f3"
+  warehouse_id: "937bc2fd7c9e58f5"
   lakebase_project_id: arxiv-agent-lakebase-corentin
   experiment_name: /Shared/arxiv-curator-course-corentin
   agent_name: arxiv_agent_corentin
@@ -72,6 +73,7 @@ prod:
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
   genie_space_id: "01f131d00fd9131091960ccbfd6b9c96"
+  warehouse_id: "xxxxxxxxxxx"
   lakebase_project_id: arxiv-agent-lakebase-corentin
   experiment_name: /Shared/arxiv-curator-course-corentin
   agent_name: arxiv_agent_corentin

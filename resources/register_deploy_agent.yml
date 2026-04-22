@@ -1,7 +1,7 @@
 resources:
   jobs:
-    arxiv_process_data_job:
-      name: arxiv_process_data
+    register_deploy_agent:
+      name: arxiv-agent-register-deploy-pipeline
       tags:
         project_name: "llmops-databricks-course-Corentin"
         team: "rc_ian"
@@ -18,16 +18,26 @@ resources:
       timeout_seconds: 3600
 
       tasks:
-        - task_key: arxiv_process_data
+        - task_key: log_register_agent
           environment_key: default
           spark_python_task:
-            python_file: ../scripts/1_process_data.py
+            python_file: ../scripts/2_log_register_agent.py
             parameters:
-              - "--root_path"
-              - "${workspace.root_path}"
               - "--env"
               - "${bundle.target}"
               - "--git_sha"
               - "${var.git_sha}"
-              - "--job_run_id"
+              - "--run_id"
               - "{{job.run_id}}"
+
+        - task_key: deploy_agent
+          depends_on:
+            - task_key: log_register_agent
+          environment_key: default
+          spark_python_task:
+            python_file: ../scripts/3_deploy_agent.py
+            parameters:
+              - "--env"
+              - "${bundle.target}"
+              - "--git_sha"
+              - "${var.git_sha}"

@@ -119,3 +119,23 @@ client.set_registered_model_alias(
     alias="latest-model",
     version=registered_model.version,
 )
+
+# COMMAND ----------
+# Load the agent model by alias "latest-model"
+model_name = f"{cfg.catalog}.{cfg.schema}.{cfg.agent_name}"
+model_uri = f"models:/{model_name}@latest-model"
+agent_model = mlflow.pyfunc.load_model(model_uri)
+
+# Example inference request
+timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+session_id = f"s-{timestamp}-{random.randint(100000, 999999)}"
+request_id = f"req-{timestamp}-{random.randint(100000, 999999)}"
+
+test_request = {
+    "input": [{"role": "user", "content": "What is the distribution of papers by authors"}],
+    "custom_inputs": {
+        "session_id": session_id,
+        "request_id": request_id,
+    },
+}
+response = agent_model.predict(test_request)
