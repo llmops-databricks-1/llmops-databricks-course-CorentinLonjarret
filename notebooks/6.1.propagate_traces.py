@@ -49,6 +49,9 @@ queries = [
     "List frequent themes in long-context model research.",
     "What topics dominate agentic AI papers?",
     "Summarize trending areas in inference optimization research.",
+    "What are recent papers about LLMs and reasoning?",
+    "What are recent papers about attention?",
+    "What is the distribution of papers by authors ?",
 ]
 
 # COMMAND ----------
@@ -71,21 +74,18 @@ for i, query in enumerate(queries):
     time.sleep(2)
 
 # COMMAND ----------
-timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-session_id = f"s-{timestamp}-{random.randint(100000, 999999)}"
-request_id = f"req-{timestamp}-{random.randint(100000, 999999)}"
+# timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+# session_id = f"s-{timestamp}-{random.randint(100000, 999999)}"
+# request_id = f"req-{timestamp}-{random.randint(100000, 999999)}"
 
-response = client.responses.create(
-    model=endpoint_name,
-    input=[{"role": "user", "content": "What are recent papers about LLMs and reasoning"}],
-    extra_body={
-        "custom_inputs": {
-            "session_id": session_id,
-            "request_id": request_id,
-        }
-    },
-)
-time.sleep(2)
-
-
-# COMMAND ----------
+# response = client.responses.create(
+#     model=endpoint_name,
+#     input=[{"role": "user", "content": "What are recent papers about LLMs and reasoning"}],
+#     extra_body={
+#         "custom_inputs": {
+#             "session_id": session_id,
+#             "request_id": request_id,
+#         }
+#     },
+# )
+# time.sleep(2)
