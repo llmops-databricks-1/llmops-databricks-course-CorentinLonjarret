@@ -32,6 +32,7 @@ dev:
   parsed_table: ai_parsed_docs_table_corentin
   chunks_table: arxiv_chunks_table_corentin
   index_table : arxiv_index_corentin
+  aggregated_view : arxiv_traces_aggregated_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
   genie_space_id: "01f131d0de26130db0900094390a53f3"
@@ -70,6 +71,7 @@ prod:
   parsed_table: ai_parsed_docs_table_corentin
   chunks_table: arxiv_chunks_table_corentin
   index_table : arxiv_index_corentin
+  aggregated_view : arxiv_traces_aggregated_corentin
   embedding_endpoint: databricks-gte-large-en
   vector_search_endpoint: llmops_course_vs_endpoint_corentin
   genie_space_id: "01f131d00fd9131091960ccbfd6b9c96"

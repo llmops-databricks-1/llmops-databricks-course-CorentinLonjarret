@@ -21,6 +21,7 @@ class ProjectConfig(BaseModel):
     parsed_table: str = Field(..., description="Parsed table name")
     chunks_table: str = Field(..., description="Chunks table name")
     index_table: str = Field(..., description="Index table name")
+    aggregated_view: str = Field(..., description="Aggregated view name")
     embedding_endpoint: str = Field(..., description="Embedding endpoint name")
     vector_search_endpoint: str = Field(..., description="Vector search endpoint name")
     genie_space_id: str = Field(..., description="Genie space ID")

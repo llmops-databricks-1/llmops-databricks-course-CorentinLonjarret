@@ -3,13 +3,27 @@
 import os
 import sys
 
+import mlflow
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.runtime import dbutils
+from dotenv import load_dotenv
 
 
 def is_databricks() -> bool:
     """Check if the code is running in a Databricks environment."""
     return "DATABRICKS_RUNTIME_VERSION" in os.environ
+
+
+def set_mlflow_tracking_uri() -> None:
+    """
+    Set the MLflow tracking URI based on the provided profile.
+
+    """
+    if "DATABRICKS_RUNTIME_VERSION" not in os.environ:
+        load_dotenv()
+        profile = os.environ.get("PROFILE", "DEV")
+        mlflow.set_tracking_uri(f"databricks://{profile}")
+        mlflow.set_registry_uri(f"databricks-uc://{profile}")
 
 
 def get_dbr_host() -> str:
