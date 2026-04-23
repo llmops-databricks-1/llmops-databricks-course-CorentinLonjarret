@@ -3,4 +3,5 @@ resources:
     agent-monitoring-dashboard:
       display_name: "[${bundle.target}] Agent Monitoring Dashboard"
       file_path: agent_monitoring_dashboard.lvdash.json
+      parent_path: ${workspace.root_path}/files/resources/dashboard
       warehouse_id: ${var.warehouse_id}

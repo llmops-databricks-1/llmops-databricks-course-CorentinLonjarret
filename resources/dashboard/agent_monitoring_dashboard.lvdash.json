@@ -4,7 +4,7 @@
       "name": "traces",
       "displayName": "Arxiv Traces Corentin",
       "queryLines": [
-        "SELECT * FROM llmops_dev.arxiv.arxiv_traces_aggregated_corentin"
+        "SELECT * FROM cbcrc_catalog_dev.rc_model_ian.arxiv_traces_aggregated_corentin"
       ],
       "columns": [
         {
