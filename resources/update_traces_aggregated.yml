@@ -25,6 +25,6 @@ resources:
         - task_key: update_and_evaluate
           environment_key: default
           notebook_task:
-            notebook_path: ../scripts/update_traces_aggregated.py
+            notebook_path: ../scripts/4_update_traces_aggregated.py
             base_parameters:
               env: ${bundle.target}
